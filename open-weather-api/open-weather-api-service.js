@@ -40,7 +40,6 @@ class OpenWeatherAPIService {
             returnWeatherObj.cityName = cityName;
             returnWeatherObj.temperature = weatherObj.main.temp_min - 273.15; //Conversion from Kelvin to Celcius
             returnWeatherObj.weatherDescription = weatherObj.weather.description; //Collect description of weather
-            returnWeatherObj
           })
           .catch(function (error) {
             const returnWeatherObj = null;
@@ -52,6 +51,7 @@ class OpenWeatherAPIService {
         return returnWeatherObj;
         // If valid weather data is found, return JSON object. Else return Null object
         // Check for if returnWeatherObejct === null and throw 404 if true
+        // To upload to web server, should probably do JSON.stringify(returnWeatherobj);
     }
 }
 
