@@ -3,7 +3,7 @@ import request from 'supertest';
 import app from '../server/app'
 
 describe("End point tests", () => {
-
+ 
     
     test("Testing if response is OK", async () => {
         const response = await request(app).get("/weather/:city");
