@@ -24,6 +24,7 @@ class OpenWeatherAPIService {
         })
         .catch(function (error){
             console.log(error);
+            return;
         })
         .finally(function () {
             //always executed
@@ -42,15 +43,15 @@ class OpenWeatherAPIService {
             returnWeatherObj.weatherDescription = weatherObj.weather.description; //Collect description of weather
           })
           .catch(function (error) {
-            const returnWeatherObj = null;
             console.log(error);
+            return;
           })
           .finally(function () {
             console.log("Attempted to collect weather data");
           });
         return returnWeatherObj;
         // If valid weather data is found, return JSON object. Else return Null object
-        // Check for if returnWeatherObejct === null and throw 404 if true
+        // Check for if returnWeatherObejct === undefined and throw 404 if true
         // To upload to web server, should probably do JSON.stringify(returnWeatherobj);
     }
 }
