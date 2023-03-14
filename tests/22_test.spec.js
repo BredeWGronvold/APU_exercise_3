@@ -28,4 +28,13 @@ describe("End point tests", () => {
         expect(response.body.weatherDescription).toBeDefined();
     });
 
+
+    test("Test if a object contains of cityName, temprature and weatherDescription", async () => {
+        const response = await request(app).get("/weather/?max=1");
+        expect(response.statusCode).toBe(200);
+        expect(response.body.cityName).toBeDefined();
+        expect(response.body.temperature).toBeDefined();
+        expect(response.body.weatherDescription).toBeDefined();
+    });
+
 });
