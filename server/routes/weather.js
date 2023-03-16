@@ -18,14 +18,19 @@ router.get('/:city', function(req, res) {
   //TODO Implement
   const cityName = req.params.city;
   const weatherAPI = new OpenWeatherAPIService;
+  const cityWeather = weatherAPI.getWeather(cityName);
   console.log(`Get city weather API called: GET ${req.params.city}`);
 
   if (!mcache.get(cityName)) {
-    const cityWeather = weatherAPI.getWeather(cityName);
+    console.log("before undefined test, not in cache");
+    console.log(cityWeather);
+    console.log("cityName LOG");
     if(typeof cityWeather === 'undefined') {
+      console.log("performing undefined test");
       router.status(404).send("Unable to resolve city name. Try again.");
       return;
     } else {
+      console.log("before get from cache, else for undefined test");
       handleCache(cityName, duration);
       router.status(200).send(JSON.stringify(cityWeather));
       return;
