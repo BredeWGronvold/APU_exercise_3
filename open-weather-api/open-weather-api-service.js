@@ -18,17 +18,17 @@ class OpenWeatherAPIService {
         `http://api.openweathermap.org/geo/1.0/direct?q=${cityName}&appid=${OpenWeatherAPIService.apiKey}`
       )
       .then(response => {
-        console.log("\nCITYJSON\n");
-        console.log(response.data);
-        console.log("\nCITYJSON_END\n");
+        //console.log("\nCITYJSON\n");
+        //console.log(response.data);
+        //console.log("\nCITYJSON_END\n");
         var [lat, lon] = [response.data[0].lat, response.data[0].lon];
-        console.log("Getting city at lat: " + lat + " lon: " + lon);
+        //console.log("Getting city at lat: " + lat + " lon: " + lon);
         return axios.get(`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${OpenWeatherAPIService.apiKey}&units=metric`);
       })
       .then(response => {
-        console.log("\nWEATHERJSON\n");
-        console.log(response.data);
-        console.log("\nWEATHERJSON_END\n");
+        //console.log("\nWEATHERJSON\n");
+        //console.log(response.data);
+        //console.log("\nWEATHERJSON_END\n");
         var returnWeatherObject = {};
         returnWeatherObject["cityName"] = cityName;
         returnWeatherObject["temperature"] = response.data.main.temp_min;
