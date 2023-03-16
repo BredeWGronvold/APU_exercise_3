@@ -6,56 +6,67 @@ const router = express.Router();
 let cacheKeyPointers = [];
 const duration = 300;
 
-function handleCache(cityName, duration) {
-  mcache.put(cityName, cityWeather, duration * 1000);
-  cacheKeyPointers.push(cityName);
-  while (mcache.size() <= cacheKeyPointers.size() || mcache.size() > 5) {
-    cacheKeyPointers.shift();
+function handleCache(cityName, cityWeather, duration) {
+  if (mcache.size() >= 5) {
+    mcache.del(mcache.keys()[0]);
+    console.log("Clearing oldest element from cache.");
   }
+  mcache.put(cityName, cityWeather, duration * 1000);
+  console.log(`Adding to cache and printing. Cache size: ${mcache.size()}`);
+  console.log(mcache.keys());
 }
 
-router.get('/:city', function(req, res) {
-  //TODO Implement
+router.get('/:city', async(req, res) => {
   const cityName = req.params.city;
+  console.log("\n#1: Calling Weather API\n");
   const weatherAPI = new OpenWeatherAPIService;
-  const cityWeather = weatherAPI.getWeather(cityName);
-  console.log(`Get city weather API called: GET ${req.params.city}`);
+  const cityWeather = await weatherAPI.getWeather(cityName);
+  console.log("#2: Get City Weather API called: ");
 
   if (!mcache.get(cityName)) {
-    console.log("before undefined test, not in cache");
+    console.log(`STATUS | Not in cache, fetching from API. Cache size: ${mcache.size()}`);
+    console.log("cityWeather object on next line: ");
     console.log(cityWeather);
-    console.log("cityName LOG");
-    if(typeof cityWeather === 'undefined') {
-      console.log("performing undefined test");
-      router.status(404).send("Unable to resolve city name. Try again.");
+    if(cityWeather == null) {
+      console.log("STATUS | Check if undefined");
+      res.status(404).send("Error 404. Unable to resolve request. Try again.");
       return;
     } else {
-      console.log("before get from cache, else for undefined test");
-      handleCache(cityName, duration);
-      router.status(200).send(JSON.stringify(cityWeather));
+      handleCache(cityName, cityWeather, duration);
+      console.log(`STATUS | Put city data in cache.`);
+      res.status(200).send(JSON.stringify(cityWeather));
       return;
     }
   } else {
-    router.status(200).send(JSON.stringify(mcache.get(cityName)));
+    console.log(`Get from cache. Cache size: ${mcache.size()}`);
+    console.log(cityWeather);
+    res.status(200).send(JSON.stringify(mcache.get(cityName)));
   }
 });
 
 router.get('/', function(req, res) {
   //TODO Implement
   const cachedCitiesBody = {};
-  if (!req.params.max) {
-    for (var i = cacheKeyPointers.length - 1; i >= 0; i--) {
-      cachedCitiesBody[[i]] = mcache.get(i);
+  console.log("Cache retrieval service");
+  console.log(req.query.max);
+  if (req.query.max == null) {
+    console.log("\n req query max not set");
+    for (var i = mcache.size() - 1; i >= 0; i--) {
+      console.log(mcache.keys()[i]); 
+      cachedCitiesBody[mcache.keys()[i]] = mcache.get(mcache.keys()[i]);
+      console.log(mcache.get(mcache.keys()[i]));
     }
-  } else if (req.params.max >= 1) {
-    for (var i = cacheKeyPointers.length - 1; i >= Math.max(0, (cacheKeyPointers.length - 1) - req.params.max); i--) {
-      cachedCitiesBody[[i]] = mcache.get(i);
+  } else if (req.query.max >= 1) {
+
+    for (var i = mcache.size() - 1; i >= Math.max(0, (mcache.size()) - req.query.max); i--) {
+      cachedCitiesBody[mcache.keys()[i]] = mcache.get(mcache.keys()[i]);
+      
     }
   } else {
-    router.status(400).send("wallah bror hva prøver du");
+    res.status(400).send("Specify a query with max > 0");
     return;
   }
-  router.status(200).send(JSON.stringify(cachedCitiesBody));
+  res.status(200).send(JSON.stringify(cachedCitiesBody));
 });
 
 export default router;
